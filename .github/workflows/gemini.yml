@@ -19,5 +19,8 @@ jobs:
         with:
           gemini_api_key: ${{ secrets.GEMINI_API_KEY }}
           prompt: |
-            Review the code changes in this pull request.
-            Provide constructive feedback on bugs, code style, and best practices.
+            You are a strict code reviewer. Analyze all Python code changes in this pull request.
+            - Always respond with at least one comment, even for small or trivial code.
+            - Point out bugs, design flaws, missing error handling, or lack of type hints.
+            - Use concise markdown bullet points for each issue.
+            - Reply in English.

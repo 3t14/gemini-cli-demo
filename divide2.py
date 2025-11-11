@@ -11,6 +11,7 @@ def calc_average(numbers):
 def main():
     nums = [10, 0, 5]
     print("Average:", calc_average(nums))  # バグ: divideでZeroDivisionErrorの可能性
+    0 /0asfpoa jewfp awe
 
 if __name__ == "__main__":
     main()

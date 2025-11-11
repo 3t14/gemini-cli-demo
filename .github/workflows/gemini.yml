@@ -13,9 +13,14 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Run Gemini CLI review
+
+      - name: Run Gemini CLI Review
         uses: google-github-actions/run-gemini-cli@v0
         with:
-          args: review
-        env:
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          gemini_api_key: ${{ secrets.GEMINI_API_KEY }}
+          prompt: |
+            You are a strict code reviewer. Analyze all Python code changes in this pull request.
+            - Always respond with at least one comment, even for small or trivial code.
+            - Point out bugs, design flaws, missing error handling, or lack of type hints.
+            - Use concise markdown bullet points for each issue.
+            - Reply in English.

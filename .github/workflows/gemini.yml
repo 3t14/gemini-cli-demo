@@ -1,4 +1,4 @@
-name: Gemini Review Demo
+name: Gemini AI Review
 
 on:
   pull_request:
@@ -14,13 +14,39 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Run Gemini CLI Review
+      - name: Run Gemini CLI
+        id: gemini
         uses: google-github-actions/run-gemini-cli@v0
         with:
           gemini_api_key: ${{ secrets.GEMINI_API_KEY }}
           prompt: |
-            You are a strict code reviewer. Analyze all Python code changes in this pull request.
-            - Always respond with at least one comment, even for small or trivial code.
-            - Point out bugs, design flaws, missing error handling, or lack of type hints.
-            - Use concise markdown bullet points for each issue.
-            - Reply in English.
+            You are a strict Python code reviewer.
+            - Always respond with at least one finding or suggestion.
+            - Identify bugs, missing error handling, and poor naming.
+            - Provide concise markdown bullet points.
+            - Respond in English.
+      
+      # --- Geminiの出力をSummaryに表示 ---
+      - name: Show Gemini output in summary
+        run: |
+          echo "### 🧠 Gemini Review Result" >> $GITHUB_STEP_SUMMARY
+          cat gemini-artifacts/stdout.log >> $GITHUB_STEP_SUMMARY
+
+      # --- PRに自動コメントを投稿 ---
+      - name: Comment Gemini result on PR
+        if: success()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const body = fs.readFileSync('gemini-artifacts/stdout.log', 'utf8');
+            if (body.trim().length === 0) {
+              console.log("No Gemini output to comment.");
+              return;
+            }
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.payload.pull_request.number,
+              body: `### 🧠 Gemini AI Review\n\n${body}`
+            });
